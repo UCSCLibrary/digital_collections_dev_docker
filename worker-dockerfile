@@ -1,0 +1,7 @@
+FROM docker_webapp:latest
+
+USER hycruz
+COPY sidekiq-entrypoint.sh /srv/sidekiq-entrypoint.sh
+
+ENTRYPOINT ["/srv/sidekiq-entrypoint.sh"]
+

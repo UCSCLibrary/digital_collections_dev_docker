@@ -1,0 +1,12 @@
+FROM tomcat:8-jre8
+
+# Set Environment Variables.
+ENV FCREPO_VERSION=4.7.2 \
+    FCREPO_HOME=/opt/fcrepo/data \
+    JAVA_OPTS='-Dfcrepo.home=${FCREPO_HOME} -Djava.awt.headless=true -Dfile.encoding=UTF-8 -server -Xms512m -Xmx1024m -XX:NewSize=256m -XX:MaxNewSize=256m -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=256m -XX:+DisableExplicitGC -Dfcrepo.modeshape.configuration=classpath:/config/file-simple/repository.json'
+
+RUN mkdir -p ${FCREPO_HOME}
+RUN wget --no-check-certificate https://github.com/fcrepo4/fcrepo4/releases/download/fcrepo-4.7.4/fcrepo-webapp-4.7.4.war \
+&& mv fcrepo-webapp-4.7.4.war ${CATALINA_HOME}/webapps/
+
+EXPOSE 8984

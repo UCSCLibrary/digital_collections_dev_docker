@@ -1,0 +1,50 @@
+FROM ruby:2.5-slim-stretch
+
+RUN apt-get -qq update \
+    && apt-get install -y --no-install-recommends  \
+                                              wget \
+                                              unzip \
+                                              git \
+                                              build-essential \
+                                              mysql-client \
+                                              default-libmysqlclient-dev \
+                                              nodejs 
+
+#Create the startup script
+RUN printf "%s\\n%s" \
+    '#!/bin/bash' \
+    'rails server ; tail -f /dev/stdout' \
+     > /docker-entrypoint.sh \
+    && chmod a+x /docker-entrypoint.sh
+
+#Switch to a non-root user
+RUN useradd -ms /bin/bash hycruz
+RUN chown hycruz:hycruz /srv
+USER hycruz
+WORKDIR /home/hycruz
+
+#Install rails
+RUN gem install rails -v 5.0.6
+
+#Bust the cache to force cloning the Github repo.
+ARG TAG=
+ARG REV=1
+ARG BRANCH=
+
+#Get SamveraHls
+RUN git clone -b master https://github.com/UCSCLibrary/samvera_hls /srv/samvera_hls
+#Get ScoobySnacks
+RUN git clone -b master https://github.com/UCSCLibrary/ScoobySnacks /srv/scooby_snacks
+#Get Hyrax
+RUN git clone -b "${BRANCH:-master}" https://github.com/UCSCLibrary/ucsc-library-digital-collections hycruz
+WORKDIR /home/hycruz/hycruz
+
+#Set the locale to UTF-8 to prevent Bundler to fail when gemspecs contain non ASCII characters
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
+#Build and install Hycruz
+RUN bundle install
+
+EXPOSE 3000
+ENTRYPOINT ["/docker-entrypoint.sh"]

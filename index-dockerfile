@@ -1,0 +1,9 @@
+FROM solr
+
+USER root
+RUN  mkdir /hycruz-solr-config
+COPY solr_conf /hycruz-solr-config
+RUN  chown -R solr:solr /hycruz-solr-config
+
+USER solr
+

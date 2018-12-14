@@ -1,0 +1,189 @@
+
+version: "3"
+
+services:
+  webapp:
+    build:  
+      context: .
+      dockerfile: webapp-dockerfile
+    container_name: hycruz
+    volumes:
+     - "derivatives:/dams_derivatives:z"
+     - "application:/srv/hycruz:z"
+     - "gems:/srv/bundle:Z"
+     - "dams_ingest:/dams_ingest"
+    depends_on:
+      - "db"
+      - "repo"
+      - "index"
+      - "redis"
+    links:
+      - "db"
+      - "repo"
+      - "index"
+      - "redis"
+    ports:
+      - "80:3000"
+    networks:
+      front-tier:
+        aliases: 
+          - hycruz
+          - hyrax
+          - app
+          - application
+      back-tier:
+        aliases:
+          - hycruz
+          - hyrax
+          - app
+          - application
+  worker:
+    build:  
+      context: .
+      dockerfile: worker-dockerfile
+    container_name: worker
+    volumes:
+     - "derivatives:/dams_derivatives:z"
+     - "application:/srv/hycruz:z"
+     - "gems2:/srv/bundle:Z"
+     - "dams_ingest:/dams_ingest"
+    depends_on:
+      - "db"
+      - "repo"
+      - "index"
+      - "redis"
+    links:
+      - "db"
+      - "repo"
+      - "index"
+      - "redis"
+    networks:
+      back-tier:
+        aliases:
+          - sidekiq
+          - worker_1
+  repo:
+    build:  
+      context: .
+      dockerfile: repo-dockerfile
+    container_name: fcrepo
+    volumes:
+      - "repository-data:/opt/fcrepo/data:Z"
+    ports:
+      - "8080:8080"
+    networks:
+      back-tier:
+        aliases:
+          - repository
+          - fedora
+  db:
+    image: mysql:5.7
+    container_name: mysql
+    ports:
+      - "3306:3306"
+      - "33060:33060"
+    environment:
+      MYSQL_DATABASE: hyrax_dev
+      MYSQL_USER: hyrax_user
+      MYSQL_ROOT_PASSWORD: potentialmidday
+      MYSQL_PASSWORD: potentialmidday
+    restart: always
+    volumes:
+      - "database-data:/var/lib/mysql:Z"
+    networks:
+      back-tier:
+        aliases:
+          - database
+          - mysql
+  redis:
+    image: 'bitnami/redis:latest'
+    container_name: redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/bitnami/redis/data
+    networks:
+      back-tier:
+        aliases:
+          - queue
+  index:
+    image: solr
+    container_name: solr
+    ports: 
+      - "8983:8983"
+    volumes:
+      - "index-data:/opt/solr/server/solr/hycruz:Z"
+    environment:
+      SOLR_HOME: /opt/solr/server/solr
+    networks:
+      back-tier:
+        aliases:
+          - solr
+volumes:
+  application:
+    driver_opts:
+      type: none
+      device: /srv/hyrax 
+      o: bind
+  dams_ingest:   
+    driver_opts:
+      type: none
+      device: /srv/dams_ingest 
+      o: bind
+  database-data:
+  derivatives:   
+    driver_opts:
+      type: none
+      device: /srv/dams_derivatives
+      o: bind
+  gems:
+  gems2:
+  index-data:
+  redis-data:
+  repository-data:
+networks:
+  front-tier:
+  back-tier:
+
+#  repl:
+#    build:  
+#      context: .
+#      dockerfile: repl-dockerfile
+#    command: ["bundle", "exec", "rails", "c"]
+#    volumes:
+#     - "application:/srv/hycruz"
+#     - "derivatives:/dams_derivatives"
+#    depends_on:
+#      - "db"
+#      - "repo"
+#      - "index"
+#    networks:
+#      back-tier:
+#        aliases:
+#          - console
+#          - ruby
+#          - rails
+#  ingest:
+#    build: 
+#      context: .
+#      dockerfile: ingest-dockerfile
+#    image: redis:alpine
+#    container_name: redis
+#    volumes:
+#      - "derivative-data:"
+#      - "index-data:"
+#      - "repository-data:"
+#    depends_on:
+#      - "db"
+#      - "index"
+#      - "repo"
+#    ports: 
+#      - "6379:6379"
+#    networks:
+#      back-tier:
+#        aliases:
+#          - redis
+#          - sidekiq
+#          - worker
