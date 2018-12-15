@@ -12,6 +12,8 @@ services:
      - "application:/srv/hycruz:z"
      - "gems:/srv/bundle:Z"
      - "dams_ingest:/dams_ingest"
+     - "scooby_snacks:/srv/scooby_snacks"
+     - "samvera_hls:/srv/samvera_hls"
     depends_on:
       - "db"
       - "repo"
@@ -47,6 +49,8 @@ services:
      - "application:/srv/hycruz:z"
      - "gems2:/srv/bundle:Z"
      - "dams_ingest:/dams_ingest"
+     - "scooby_snacks:/srv/scooby_snacks"
+     - "samvera_hls:/srv/samvera_hls"
     depends_on:
       - "db"
       - "repo"
@@ -143,6 +147,16 @@ volumes:
   index-data:
   redis-data:
   repository-data:
+  scooby_snacks:
+    driver_opts:
+      type: none
+      device: /srv/scooby_snacks 
+      o: bind
+  samvera_hls:
+    driver_opts:
+      type: none
+      device: /srv/samvera_hls
+      o: bind
 networks:
   front-tier:
   back-tier:
