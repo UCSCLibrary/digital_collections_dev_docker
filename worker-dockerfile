@@ -1,6 +1,42 @@
 FROM docker_webapp:latest
 
+USER root
+
+RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list
+
+RUN apt-get -qq update \
+    && apt-get install -y --no-install-recommends  \
+      unzip \
+      ghostscript \
+      libmagickcore-dev \
+      mediainfo \
+      clamav \
+      libclamav-dev \
+      ffmpeg \
+      libreoffice
+                                               
+RUN apt-get install -y --no-install-recommends -t stretch-backports \
+    openjdk-8-jre-headless \
+    ca-certificates-java
+
+COPY fits /srv/fits
+RUN chown -R hycruz:hycruz /srv/fits
+RUN chmod 755 /srv/fits/fits.sh
+
 USER hycruz
+
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
+ENV APP_DIR=/srv/hycruz 
+ENV TEMP=${APP_DIR}/tmp 
+
+ENV GEM_HOME="/srv/bundle"
+ENV PATH $GEM_HOME/bin:$GEM_HOME/gems/bin:$PATH
+
+RUN mkdir -p ${APP_DIR}
+WORKDIR ${APP_DIR}
+
 COPY sidekiq-entrypoint.sh /srv/sidekiq-entrypoint.sh
 
 ENTRYPOINT ["/srv/sidekiq-entrypoint.sh"]

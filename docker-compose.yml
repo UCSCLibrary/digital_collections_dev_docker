@@ -1,4 +1,3 @@
-
 version: "3"
 
 services:
@@ -14,6 +13,9 @@ services:
      - "dams_ingest:/dams_ingest"
      - "scooby_snacks:/srv/scooby_snacks"
      - "samvera_hls:/srv/samvera_hls"
+     - "bulk_ops:/srv/bulk_ops"
+    environment: 
+      - IIIF_SERVER_URL=http://127.0.0.1:8182/iiif/2/
     depends_on:
       - "db"
       - "repo"
@@ -51,6 +53,7 @@ services:
      - "dams_ingest:/dams_ingest"
      - "scooby_snacks:/srv/scooby_snacks"
      - "samvera_hls:/srv/samvera_hls"
+     - "bulk_ops:/srv/bulk_ops"
     depends_on:
       - "db"
       - "repo"
@@ -119,12 +122,38 @@ services:
       - "8983:8983"
     volumes:
       - "index-data:/opt/solr/server/solr/hycruz:Z"
+      - "index-data-test:/opt/solr/server/solr/hycruz-test:Z"
     environment:
       SOLR_HOME: /opt/solr/server/solr
     networks:
       back-tier:
         aliases:
           - solr
+  images:    
+    build:  
+      context: .
+      dockerfile: cantaloupe-dockerfile
+    container_name: cantaloupe
+    depends_on:
+      - "repo"
+    ports:
+      - "8182:8182"
+      - "8183:8183"
+    volumes:
+      - "derivatives:/dams_derivatives:z"
+      - "cantaloupe-log:/srv/cantaloupe-log:Z"
+      - "cantaloupe-cache:/srv/cantaloupe-cache:Z"
+    networks:
+      front-tier:
+        aliases: 
+          - images
+          - cantaloupe
+          - hycruz-images
+      back-tier:
+        aliases:
+          - images
+          - cantaloupe
+          - hycruz-images
 volumes:
   application:
     driver_opts:
@@ -144,7 +173,10 @@ volumes:
       o: bind
   gems:
   gems2:
+  cantaloupe-log:
+  cantaloupe-cache:
   index-data:
+  index-data-test:
   redis-data:
   repository-data:
   scooby_snacks:
@@ -156,6 +188,11 @@ volumes:
     driver_opts:
       type: none
       device: /srv/samvera_hls
+      o: bind
+  bulk_ops:
+    driver_opts:
+      type: none
+      device: /srv/bulk_ops
       o: bind
 networks:
   front-tier:

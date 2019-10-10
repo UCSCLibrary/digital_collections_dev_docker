@@ -1,4 +1,4 @@
-FROM ruby:2.3.1
+FROM ruby:2.4.1-stretch
 
 RUN apt-get -qq update \
     && apt-get install -y --no-install-recommends  \
@@ -7,7 +7,7 @@ RUN apt-get -qq update \
                                               git \
                                               build-essential \
                                               mysql-client \
-                                              libmysqlclient-dev \
+                                              default-libmysqlclient-dev \
                                               nodejs 
 
 #Switch to a non-root user
@@ -22,13 +22,16 @@ RUN git clone https://github.com/UCSCLibrary/samvera_hls.git /srv/samvera_hls
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 
-ENV APP_DIR=/srv/hycruz 
-ENV TEMP=${APP_DIR}/tmp \
-    BUNDLE_GEMFILE=$APP_DIR/Gemfile \
-    BUNDLE_JOBS=2 \
-    BUNDLE_PATH=/srv/bundle
+ENV hls_token_secret fsdifgu890dfsgu7oijuio342jiot89789s7f89
 
-RUN mkdir -p ${BUNDLE_PATH}
+ENV APP_DIR=/srv/hycruz 
+ENV TEMP=${APP_DIR}/tmp 
+#ENV BUNDLE_GEMFILE=$APP_DIR/Gemfile 
+#ENV BUNDLE_PATH=/srv/bundle
+
+ENV GEM_HOME="/srv/bundle"
+ENV PATH $GEM_HOME/bin:$GEM_HOME/gems/bin:$PATH
+
 RUN mkdir -p ${APP_DIR}
 WORKDIR ${APP_DIR}
 
@@ -36,5 +39,5 @@ EXPOSE 3000
 
 COPY hycruz-entrypoint.sh /srv/entrypoint.sh
 
-ENTRYPOINT ["/srv/entrypoint.sh"]
 
+ENTRYPOINT ["/srv/entrypoint.sh"]
