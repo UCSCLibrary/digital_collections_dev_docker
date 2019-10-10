@@ -1,0 +1,10 @@
+#!/bin/bash
+while [ 1 ] 
+do
+  HOMEPAGE= `echo 10`
+  SHOWPAGE= `echo 20`
+  SEARCHPAGE= `echo 30`
+  echo "${HOMEPAGE} ${SHOWPAGE} ${SEARCHPAGE}" >> dc-pageloads.txt
+  sleep 120
+  echo "monitor digitalcollections pageloadtimes. press ctrl-c to exit."
+done
