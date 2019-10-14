@@ -59,13 +59,13 @@ Next you need to get our solr configuration files onto the solr container. Log o
 docker cp ${HYCRUZ_PATH}/docker/solr-conf/. mysql:/opt/solr/server/solr/hycruz/config
 ```
 Finally you can create the actual core in solr. In your browser, navigate to http://localhost/solr/~cores and click "Add Core". Enter the following information:
-
+```
 name: Hycruz
 instance_dir: /opt/solr/server/solr/hycruz
 data_dir: /opt/solr/server/solr/hycruz/data
 config: /opt/solr/server/solr/hycruz/config/solrconfig.xml
 schema: /opt/solr/server/solr/hycruz/config/schema.xml
-
+```
 Click 'Add Core' and make sure it creates the core successfully.
 
 ## Restart Docker and check for errors
