@@ -17,28 +17,6 @@ mkdir ${HYCRUZ_HOME}/dams_derivatives
 cd ${HYCRUZ_HOME}/docker
 ```
 
-
-### Initialize relational database
-First, try starting up the docker stack and ignore any errors from the Solr (index), Hyrax (webapp), and Sidekiq (worker) containers.
-```
-cd ${HYCRUZ_HOME}
-docker-compose up
-```
-Ignoring the stream of error and status messages, open a new terminal and enter the following to log into the MySql (Db) container and initialize the mysql installation there. Follow the prompts to customize the root password and such. You can accept most of the defaults here.
-```
-docker exec -it mysql bash
-> mysql -u root
-> sudo mysql_secure_installation
-```
-Now log in to MySql with `mysql -u root -p{PASSWORD CREATED IN LAST STEP}` and create a new database and a new user with full access privileges to that database. Keep track of the username, password, and database name which you will use in the next step.
-```
-CREATE DATABASE 'hycruz';
-CREATE USER 'dev_user'@'localhost' IDENTIFIED BY 'dev_pass';
-GRANT ALL PRIVILEGES ON hycruz.* TO 'newuser'@'localhost';
-FLUSH PRIVILEGES
-```
-That should do it for the relational database. Log out and you're all set.
-
 ### Edit private configuration files
 Certain configuration files contain sensitive information and are therefore omitted from the public github repositories. You will need to create these configuration files manually. Please contact our developers for assistance if you have issues with this.
 These files include:
