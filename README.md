@@ -7,7 +7,7 @@ This repository contains docker files and auxiliary packages necessary to set up
 ### Clone repositories and set up directory structure
 ```bash
 HYCRUZ_HOME="/srv"
-git clone git@github.com:UCSCLibrary/ucsc-library-digital-collections.git ${HYCRUZ_HOME}/hycruz
+git clone git@github.com:UCSCLibrary/ucsc-library-digital-collections.git ${HYCRUZ_HOME}/hyrax
 git clone git@github.com:UCSCLibrary/digital_collections_dev_docker.git ${HYCRUZ_HOME}/docker
 git clone git@github.com:UCSCLibrary/bulk_ops.git ${HYCRUZ_HOME}/bulk_ops
 git clone git@github.com:UCSCLibrary/scooby_snacks.git ${HYCRUZ_HOME}/scooby_snacks
