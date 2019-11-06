@@ -6,15 +6,14 @@ This repository contains docker files and auxiliary packages necessary to set up
 ## Setting up your development environment
 ### Clone repositories and set up directory structure
 ```bash
-HYCRUZ_HOME="/srv"
-git clone git@github.com:UCSCLibrary/ucsc-library-digital-collections.git ${HYCRUZ_HOME}/hyrax
-git clone git@github.com:UCSCLibrary/digital_collections_dev_docker.git ${HYCRUZ_HOME}/docker
-git clone git@github.com:UCSCLibrary/bulk_ops.git ${HYCRUZ_HOME}/bulk_ops
-git clone git@github.com:UCSCLibrary/scooby_snacks.git ${HYCRUZ_HOME}/scooby_snacks
-git clone git@github.com:UCSCLibrary/samvera_hls.git ${HYCRUZ_HOME}/samvera_hls
-mkdir ${HYCRUZ_HOME}/dams_ingest
-mkdir ${HYCRUZ_HOME}/dams_derivatives
-cd ${HYCRUZ_HOME}/docker
+git clone git@github.com:UCSCLibrary/ucsc-library-digital-collections.git /srv/hyrax
+git clone git@github.com:UCSCLibrary/digital_collections_dev_docker.git /srv/docker
+git clone git@github.com:UCSCLibrary/bulk_ops.git /srv/bulk_ops
+git clone git@github.com:UCSCLibrary/scooby_snacks.git /srv/scooby_snacks
+git clone git@github.com:UCSCLibrary/samvera_hls.git /srv/samvera_hls
+mkdir /srv/dams_ingest
+mkdir /srv/dams_derivatives
+cd /srv/docker
 ```
 
 ### Edit private configuration files
@@ -27,14 +26,15 @@ These files include:
 
 ### Create Solr core
 The Solr part of this docker environment does not come pre-configured for our indexing needs (we could improve this repository in the future by setting that up). Currently some on-time configuration work is necessary to get Solr started for the first time on a development instance. Vague instructions for this step are provided for now as a placeholder pending the creation of a more thorough walkthrough.
-First, log in to the solr container using `docker exec -it solr bash`. Create the directory structure you need with:
+First, log in to the solr container using `docker exec -u root -it solr bash`. Create the directory structure you need with:
 ```
 mkdir /opt/solr/server/solr/hycruz
 mkdir /opt/solr/server/solr/hycruz/data
+chown -R solr /opt/solr/server/solr/hycruz
 ```
 Next you need to get our solr configuration files onto the solr container. Log out of the solr container and use the following command:
 ```
-docker cp ${HYCRUZ_PATH}/docker/solr-conf/. solr:/opt/solr/server/solr/hycruz/config
+docker cp /srv/docker/solr-conf/. solr:/opt/solr/server/solr/hycruz/config
 ```
 Finally you can create the actual core in solr. In your browser, navigate to http://localhost/solr/~cores and click "Add Core". Enter the following information:
 ```
