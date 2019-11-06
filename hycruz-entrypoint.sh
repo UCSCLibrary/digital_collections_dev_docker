@@ -23,7 +23,7 @@ fi
 bundle check || bundle install
 
 #echo "Running Database Migration"
-bundle exec rake db:migrate 
+#bundle exec rake db:migrate 
 
 #echo "Seeding Database"
 #bundle exec rake db:seed
