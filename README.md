@@ -5,9 +5,13 @@ This repository contains docker files and auxiliary packages necessary to set up
 
 ## Setting up your development environment
 ### Clone repositories and set up directory structure
+
+Clone the following repositories into your local `/srv` folder.  
+
 ```bash
 HYCRUZ_HOME="/srv"
-git clone git@github.com:UCSCLibrary/ucsc-library-digital-collections.git ${HYCRUZ_HOME}/hycruz
+
+git clone git@github.com:UCSCLibrary/ucsc-library-digital-collections.git ${HYCRUZ_HOME}/hyrax
 git clone git@github.com:UCSCLibrary/digital_collections_dev_docker.git ${HYCRUZ_HOME}/docker
 git clone git@github.com:UCSCLibrary/bulk_ops.git ${HYCRUZ_HOME}/bulk_ops
 git clone git@github.com:UCSCLibrary/scooby_snacks.git ${HYCRUZ_HOME}/scooby_snacks
@@ -19,11 +23,15 @@ cd ${HYCRUZ_HOME}/docker
 
 
 ### Initialize relational database
+
 First, try starting up the docker stack and ignore any errors from the Solr (index), Hyrax (webapp), and Sidekiq (worker) containers.
 ```
 cd ${HYCRUZ_HOME}
 docker-compose up
 ```
+
+You may need to run `docker-compose build web app` before `docker-compose up`. 
+
 Ignoring the stream of error and status messages, open a new terminal and enter the following to log into the MySql (Db) container and initialize the mysql installation there. Follow the prompts to customize the root password and such. You can accept most of the defaults here.
 ```
 docker exec -it mysql bash
