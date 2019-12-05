@@ -7,6 +7,6 @@ ENV FCREPO_VERSION=4.7.2 \
 
 RUN mkdir -p ${FCREPO_HOME}
 RUN wget --no-check-certificate https://github.com/fcrepo4/fcrepo4/releases/download/fcrepo-4.7.4/fcrepo-webapp-4.7.4.war \
-&& mv fcrepo-webapp-4.7.4.war ${CATALINA_HOME}/webapps/
+&& mv fcrepo-webapp-4.7.4.war ${CATALINA_HOME}/webapps/fcrepo.war
 
 EXPOSE 8984
