@@ -31,6 +31,7 @@ ENV TEMP=${APP_DIR}/tmp
 
 ENV GEM_HOME="/srv/bundle"
 ENV PATH $GEM_HOME/bin:$GEM_HOME/gems/bin:$PATH
+RUN gem install bundler
 
 RUN mkdir -p ${APP_DIR}
 WORKDIR ${APP_DIR}
