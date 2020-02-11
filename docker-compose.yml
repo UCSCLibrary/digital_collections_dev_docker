@@ -1,33 +1,36 @@
 version: "3"
 
 services:
-  webapp:
+  web:
+    image: registry.gitlab.com/notch8/ucsc-docker/webapp:latest
     build:  
       context: .
       dockerfile: webapp-dockerfile
     container_name: hycruz
     volumes:
-     - "derivatives:/dams_derivatives:z"
-     - "application:/srv/hycruz:z"
+     - "../dams_derivatives:/dams_derivatives:z"
+     - "../hyrax:/srv/hycruz:z"
      - "gems:/srv/bundle:Z"
-     - "dams_ingest:/dams_ingest"
-     - "scooby_snacks:/srv/scooby_snacks"
-     - "samvera_hls:/srv/samvera_hls"
-     - "bulk_ops:/srv/bulk_ops"
+     - "../dams_ingest:/dams_ingest"
+     - "../scooby_snacks:/srv/scooby_snacks"
+     - "../samvera_hls:/srv/samvera_hls"
+     - "../bulk_ops:/srv/bulk_ops"
+     - "./config/database.yml:/srv/hycruz/config/database.yml"
+     - "./config/secrets.yml:/srv/hycruz/config/secrets.yml"
+     - "./config/fedora.yml:/srv/hycruz/config/fedora.yml"
+     - "./config/github.yml:/srv/hycruz/config/github.yml"
     environment: 
-      - IIIF_SERVER_URL=http://127.0.0.1:8182/iiif/2/
+      - IIIF_SERVER_URL=http://images:8182/iiif/2/
     depends_on:
       - "db"
       - "repo"
       - "index"
       - "redis"
-    links:
-      - "db"
-      - "repo"
-      - "index"
-      - "redis"
     ports:
-      - "80:3000"
+      - "3000:3000"
+    env_file:
+      - .env
+      - .env.development
     networks:
       front-tier:
         aliases: 
@@ -42,24 +45,23 @@ services:
           - app
           - application
   worker:
+    image: registry.gitlab.com/notch8/ucsc-docker/worker:latest
     build:  
       context: .
       dockerfile: worker-dockerfile
     container_name: worker
     volumes:
-     - "derivatives:/dams_derivatives:z"
-     - "application:/srv/hycruz:z"
+     - "../dams_derivatives:/dams_derivatives:z"
+     - "../hyrax:/srv/hycruz:z"
      - "gems2:/srv/bundle:Z"
-     - "dams_ingest:/dams_ingest"
-     - "scooby_snacks:/srv/scooby_snacks"
-     - "samvera_hls:/srv/samvera_hls"
-     - "bulk_ops:/srv/bulk_ops"
+     - "../dams_ingest:/dams_ingest"
+     - "../scooby_snacks:/srv/scooby_snacks"
+     - "../samvera_hls:/srv/samvera_hls"
+     - "../bulk_ops:/srv/bulk_ops"
+    env_file:
+      - .env
+      - .env.development
     depends_on:
-      - "db"
-      - "repo"
-      - "index"
-      - "redis"
-    links:
       - "db"
       - "repo"
       - "index"
@@ -70,6 +72,7 @@ services:
           - sidekiq
           - worker_1
   repo:
+    image: registry.gitlab.com/notch8/ucsc-docker/repo:latest
     build:  
       context: .
       dockerfile: repo-dockerfile
@@ -89,11 +92,9 @@ services:
     ports:
       - "3306:3306"
       - "33060:33060"
-    environment:
-      MYSQL_DATABASE: hyrax_dev
-      MYSQL_USER: hyrax_user
-      MYSQL_ROOT_PASSWORD: potentialmidday
-      MYSQL_PASSWORD: potentialmidday
+    env_file:
+      - .env
+      - .env.development
     restart: always
     volumes:
       - "database-data:/var/lib/mysql:Z"
@@ -116,20 +117,22 @@ services:
         aliases:
           - queue
   index:
-    image: solr
+    image: solr:7.7
     container_name: solr
+    command: "bash -c 'precreate-core hycruz /opt/config && precreate-core hycruz-test /opt/config && solr-foreground'"
     ports: 
       - "8983:8983"
     volumes:
-      - "index-data:/opt/solr/server/solr/hycruz:Z"
-      - "index-data-test:/opt/solr/server/solr/hycruz-test:Z"
+      - "./solr_conf:/opt/config:Z"
+      - "index-data:/opt/solr/server/solr:Z"
     environment:
       SOLR_HOME: /opt/solr/server/solr
     networks:
       back-tier:
         aliases:
           - solr
-  images:    
+  images:
+    image: registry.gitlab.com/notch8/ucsc-docker/images:latest
     build:  
       context: .
       dockerfile: cantaloupe-dockerfile
@@ -140,7 +143,7 @@ services:
       - "8182:8182"
       - "8183:8183"
     volumes:
-      - "derivatives:/dams_derivatives:z"
+      - "../dams_derivatives:/dams_derivatives:z"
       - "cantaloupe-log:/srv/cantaloupe-log:Z"
       - "cantaloupe-cache:/srv/cantaloupe-cache:Z"
     networks:
@@ -155,45 +158,14 @@ services:
           - cantaloupe
           - hycruz-images
 volumes:
-  application:
-    driver_opts:
-      type: none
-      device: /srv/hyrax 
-      o: bind
-  dams_ingest:   
-    driver_opts:
-      type: none
-      device: /srv/dams_ingest 
-      o: bind
   database-data:
-  derivatives:   
-    driver_opts:
-      type: none
-      device: /srv/dams_derivatives
-      o: bind
   gems:
   gems2:
   cantaloupe-log:
   cantaloupe-cache:
   index-data:
-  index-data-test:
   redis-data:
   repository-data:
-  scooby_snacks:
-    driver_opts:
-      type: none
-      device: /srv/scooby_snacks 
-      o: bind
-  samvera_hls:
-    driver_opts:
-      type: none
-      device: /srv/samvera_hls
-      o: bind
-  bulk_ops:
-    driver_opts:
-      type: none
-      device: /srv/bulk_ops
-      o: bind
 networks:
   front-tier:
   back-tier:

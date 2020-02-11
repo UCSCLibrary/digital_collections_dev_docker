@@ -1,4 +1,4 @@
-FROM docker_webapp:latest
+FROM registry.gitlab.com/notch8/ucsc-docker/webapp:latest
 
 USER root
 

@@ -22,8 +22,11 @@ fi
 #echo "Checking and Installing Ruby Gems"
 bundle check || bundle install
 
-#echo "Running Database Migration"
-bundle exec rake db:migrate 
+echo "Running Database Migration"
+bundle exec rake db:migrate
+
+echo "Running Test Database Setup"
+bundle exec rails db:test:prepare
 
 #echo "Seeding Database"
 #bundle exec rake db:seed
@@ -36,6 +39,9 @@ bundle exec rake db:migrate
 
 echo 'alias repl="cd /srv/hycruz; unset BUNDLE_PATH; unset BUNDLE_BIN; GEM_HOME=/srv/bundle; bundle exec rails c"' >> /home/hycruz/.bashrc
 echo 'alias errors="tail -n 1000 /srv/hyrax/logs/development.log | grep FATAL -A 20 -B 20"' >> /home/hycruz/.bashrc
+echo 'unset BUNDLE_PATH' >> /home/hycruz/.bashrc
+echo 'unset BUNDLE_BIN' >> /home/hycruz/.bashrc
+
 
 echo "Starting the Rails Server"
 bundle exec rails s -b 0.0.0.0
