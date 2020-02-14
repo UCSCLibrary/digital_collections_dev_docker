@@ -23,9 +23,21 @@ cd docker
 ### Edit private configuration files
 All configuration is done in .env.development.  Currently defaults can be found in .env, but items in .env.development can be used to override these values.
 
-
 ## Start Docker and check for errors
 In the original docker terminal, enter `docker-compose up` to completely start the docker stack. Hopefully everything will come online succesfully. Navigate to http://localhost:3000 to view the site if it works.
+
+## Initialize database
+```bash
+docker exec -it mysql bash
+mysql -u hyrax_user -pMY_PASSWORD_FROM_ENV 
+create database hyrax_dev
+create database hyrax_test
+CREATE USER 'hyrax_user'@'%' IDENTIFIED BY 'potentialmidday';
+CREATE USER 'hyrax_user'@'localhost' IDENTIFIED BY 'potentialmidday';
+grant all privileges on *.* to 'hyrax_user'@'%'
+grant all privileges on *.* to 'hyrax_user'@'localhost'
+FLUSH PRIVILEGES
+```
 
 ## Log in to a repl on the dev site
 If you need a repl on the dev site, first log in to the webapp container: `docker exec -it hycruz bash`. Then you can just enter `repl` to activate a shortcut I created to set the bundle parameters correctly and start the repl. 
