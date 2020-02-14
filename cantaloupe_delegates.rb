@@ -2,7 +2,7 @@ require 'net/http'
 require 'uri'
 require 'json'
 require 'java'
-
+require 'digest'
 
 ##
 # Modified by Ned Henry to work for cantaloupe 4.0.x
@@ -16,137 +16,30 @@ require 'java'
 
 
 class CustomDelegate
-
-  ##
-  # Attribute for the request context, which is a hash containing information
-  # about the current request.
-  #
-  # This attribute will be set by the server before any other methods are
-  # called. Methods can access its keys like:
-  #
-  # ```
-  # identifier = context['identifier']
-  # ```
-  #
-  # The hash will contain the following keys in response to all requests:
-  #
-  # * `client_ip`       [String] Client IP address.
-  # * `cookies`         [Hash<String,String>] Hash of cookie name-value pairs.
-  # * `identifier`      [String] Image identifier.
-  # * `request_headers` [Hash<String,String>] Hash of header name-value pairs.
-  # * `request_uri`     [String] Public request URI.
-  #
-  # It will contain the following additional string keys in response to image
-  # requests:
-  #
-  # * `full_size`      [Hash<String,Integer>] Hash with `width` and `height`
-  #                    keys corresponding to the pixel dimensions of the
-  #                    source image.
-  # * `operations`     [Array<Hash<String,Object>>] Array of operations in
-  #                    order of application. Only operations that are not
-  #                    no-ops will be included. Every hash contains a `class`
-  #                    key corresponding to the operation class name, which
-  #                    will be one of the `e.i.l.c.operation.Operation`
-  #                    implementations.
-  # * `output_format`  [String] Output format media (MIME) type.
-  # * `resulting_size` [Hash<String,Integer>] Hash with `width` and `height`
-  #                    keys corresponding to the pixel dimensions of the
-  #                    resulting image after all operations have been applied.
-  #
-  # @return [Hash] Request context.
-  #
   attr_accessor :context
 
-  ##
-  # Tells the server whether to redirect in response to the request. Will be
-  # called upon all image requests.
-  #
-  # @param options [Hash] Empty hash.
-  # @return [Hash<String,Object>,nil] Hash with `location` and `status_code`
-  #         keys. `location` must be a URI string; `status_code` must be an
-  #         integer from 300 to 399. Return nil for no redirect.
-  #
+  SECRET_KEY = "wa0W7M3IiwP88iDz7VkCbg0lZxlUSDtbVGwJ5hSrIrtRSWNy2xohZtP"
+  AUTH_URL = "http://hycruz:3000/authorize"
+
   def redirect(_options = {})
     nil
   end
 
-  ##
-  # Tells the server whether the given request is authorized. Will be called
-  # upon all image requests to any endpoint.
-  #
-  # Implementations should assume that the underlying resource is available,
-  # and not try to check for it.
-  #
-  # @param options [Hash] Empty hash.
-  # @return [Boolean] Whether the request is authorized.
-  #
-  def authorized?(_options = {})
-    return true
+  def authorized?(options = {})
+    #check CSRV token, verify request comes through DAMS site
+    if context['resulting_size']['width'] > 1200
+      (expires, token) = (context['cookies']['ucsc_imgsrv_token'] || '').split('-')
+      return false unless token && expires
+      return false unless Digest::SHA256.hexdigest(expires.to_i.to_s + SECRET_KEY) == token
+      return false unless expires.to_i > Time.now.to_i
+    end
 
-    @request = context['request_uri'].split('/')
-    @width = context['full_size']['width'] unless context['full_size'].nil?
-
-    check_region
-    check_requested_width
-
-    !(full? || oversized?)
-  end
-
-  ##
-  # Used to add additional keys to an information JSON response. See the
-  # [Image API specification](http://iiif.io/api/image/2.1/#image-information).
-  #
-  # @param options [Hash] Empty hash.
-  # @return [Hash] Hash that will be merged into an IIIF Image API 2.x
-  #                information response. Return an empty hash to add nothing.
-  #
-  def extra_iiif2_information_response_keys(_options = {})
-    {}
-  end
-
-  ##
-  # Tells the server which source to use for the given identifier.
-  #
-  # @param options [Hash] Empty hash.
-  # @return [String] Source name.
-  #
-  def source(_options = {})
-    'HttpSource'
-  end
-
-  ##
-  # Gets the HTTP-sourced image resource information.
-  #
-  # @param options [Hash] Empty hash.
-  # @return [String,Hash<String,String>,nil] String URI; Hash with `uri` key,
-  #         and optionally `username` and `secret` keys; or nil if not found.
-  #
-  def httpsource_resource_info(_options = {})
-    file_id = context['identifier']
-
-    # Split the parts into Fedora's pseudo-pairtree (only first four pairs)
-    paths = file_id.split(/(.{0,2})/).reject!(&:empty?)[0, 4]
-
-    fedora_base_url = "http://repo:8080/fcrepo-webapp-4.7.4/rest/dev"
-    return "#{fedora_base_url}/#{paths.join('/')}/#{file_id.gsub('%2F','/')}"
-  end
-
-  private
-
-  def check_region
-    @region = @request[@request.length - 4]
-  end
-
-  def check_requested_width
-    @requested_width = @request[@request.length - 3].split(',')[0]
-  end
-
-  def full?
-    @region == 'full' && %w[full max].include?(@requested_width)
-  end
-
-  # Don't allow image requests that are more than 50% of the original
-  def oversized?
-    @requested_width.to_i > (@width.to_f * 0.5).to_i
+    #check with DAMS that image is permitted to display to current user (or public if not logged in)
+    uri = URI.parse(File.join(AUTH_URL,context['identifier'].gsub('/','')))
+    http = Net::HTTP.new(uri.host, uri.port)
+    request = Net::HTTP::Get.new(uri.request_uri)
+    request['Cookie'] = context['cookies'].map{|(name,val)|"#{name}=#{val}"}.join(';')
+    response = http.request(request)
+    return ((response.code == 200) or (response.body == "Access Granted"))
   end
 end
