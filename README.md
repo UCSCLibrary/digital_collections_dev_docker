@@ -11,6 +11,10 @@ git clone git@github.com:UCSCLibrary/digital_collections_dev_docker.git docker
 git clone git@github.com:UCSCLibrary/bulkops.git bulk_ops
 git clone git@github.com:UCSCLibrary/scoobysnacks.git scooby_snacks
 git clone git@github.com:UCSCLibrary/samvera_hls.git samvera_hls
+wget https://github.com/harvard-lts/fits/releases/download/1.5.0/fits-1.5.0.zip
+unzip fits-1.5.0.zip
+fits-1.5.0 fits
+rm fits-1.5.0.zip
 mkdir dams_ingest
 mkdir dams_derivatives
 cd docker

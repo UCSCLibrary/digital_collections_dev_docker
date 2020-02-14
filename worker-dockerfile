@@ -19,7 +19,7 @@ RUN apt-get install -y --no-install-recommends -t stretch-backports \
     openjdk-8-jre-headless \
     ca-certificates-java
 
-COPY fits /srv/fits
+COPY ../fits /srv/fits
 RUN chown -R hycruz:hycruz /srv/fits
 RUN chmod 755 /srv/fits/fits.sh
 
