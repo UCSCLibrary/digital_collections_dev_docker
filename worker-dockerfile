@@ -32,7 +32,8 @@ ENV APP_DIR=/srv/hycruz
 ENV TEMP=${APP_DIR}/tmp 
 
 ENV GEM_HOME="/srv/bundle"
-ENV PATH $GEM_HOME/bin:$GEM_HOME/gems/bin:$PATH
+ENV PATH $GEM_HOME/bin:$GEM_HOME/gems/bin:/usr/share/kakadu:$PATH
+ENV LD_LIBRARY_PATH /usr/share/kakadu:$LD_LIBRARY_PATH
 
 RUN mkdir -p ${APP_DIR}
 WORKDIR ${APP_DIR}
