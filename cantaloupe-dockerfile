@@ -7,6 +7,9 @@ FROM openjdk:8-jdk-stretch
 # $ sudo docker run -d --rm -p 8183:8182 -v ./images:/var/lib/cantaloupe/images --name cantaloupe cantaloupe
 
 ENV CANTALOUPE_VERSION 4.0.3
+ENV PATH /usr/share/kakadu:$PATH
+ENV LD_LIBRARY_PATH /usr/share/kakadu:$LD_LIBRARY_PATH
+
 EXPOSE 8182
 
 RUN apt-get update \
