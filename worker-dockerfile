@@ -19,9 +19,6 @@ RUN apt-get install -y --no-install-recommends -t stretch-backports \
     openjdk-8-jre-headless \
     ca-certificates-java
 
-RUN chown -R hycruz:hycruz /srv/fits
-RUN chmod 755 /srv/fits/fits.sh
-
 USER hycruz
 
 ENV LANG C.UTF-8
