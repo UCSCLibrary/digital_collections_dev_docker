@@ -59,6 +59,7 @@ services:
      - "../scooby_snacks:/srv/scooby_snacks"
      - "../samvera_hls:/srv/samvera_hls"
      - "../bulk_ops:/srv/bulk_ops"
+     - "../fits:/srv/fits"
      - "./config/database.yml:/srv/hycruz/config/database.yml"
      - "./config/secrets.yml:/srv/hycruz/config/secrets.yml"
      - "./config/fedora.yml:/srv/hycruz/config/fedora.yml"
