@@ -13,7 +13,6 @@ services:
       - "db"
       - "repo"
       - "index"
-      - "redis"
     ports:
       - "3000:3000"
     env_file:
@@ -32,27 +31,6 @@ services:
           - hyrax
           - app
           - application
-  worker:
-    image: registry.gitlab.com/notch8/ucsc-docker/worker:latest
-    build:  
-      context: .
-      dockerfile: worker-dockerfile
-    container_name: worker
-    volumes:
-     - "dams_derivatives:/dams_derivatives:Z"
-    env_file:
-      - .env
-      - .env.development
-    depends_on:
-      - "db"
-      - "repo"
-      - "index"
-      - "redis"
-    networks:
-      back-tier:
-        aliases:
-          - sidekiq
-          - worker_1
   repo:
     image: registry.gitlab.com/notch8/ucsc-docker/repo:latest
     build:  
@@ -68,9 +46,6 @@ services:
           - fedora
   db:
     image: mysql:5.7
-#    build:  
-#      context: .
-#      dockerfile: db-dockerfile
     container_name: mysql
     ports:
       - "3306:3306"
@@ -84,17 +59,6 @@ services:
         aliases:
           - database
           - mysql
-  redis:
-    image: 'bitnami/redis:latest'
-    container_name: redis
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-    ports:
-      - '6379:6379'
-    networks:
-      back-tier:
-        aliases:
-          - queue
   index:
     image: registry.gitlab.com/notch8/ucsc-docker/index:latest
     build: 
@@ -110,29 +74,8 @@ services:
       back-tier:
         aliases:
           - solr
-  images:
-    image: registry.gitlab.com/notch8/ucsc-docker/images:latest
-    build:  
-      context: .
-      dockerfile: cantaloupe-dockerfile
-    container_name: cantaloupe
-    depends_on:
-      - "repo"
-    ports:
-      - "8182:8182"
-      - "8183:8183"
-    networks:
-      front-tier:
-        aliases: 
-          - images
-          - cantaloupe
-          - hycruz-images
-      back-tier:
-        aliases:
-          - images
-          - cantaloupe
-          - hycruz-images
 volumes:
+  dams_ingest:
   dams_derivatives:
 networks:
   front-tier:
