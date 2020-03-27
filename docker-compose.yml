@@ -8,20 +8,7 @@ services:
       dockerfile: webapp-dockerfile
     container_name: hycruz
     volumes:
-     - "../dams_derivatives:/dams_derivatives:z"
-     - "../hyrax:/srv/hycruz:z"
-     - "gems:/srv/bundle:Z"
-     - "../dams_ingest:/dams_ingest"
-     - "../scooby_snacks:/srv/scooby_snacks"
-     - "../samvera_hls:/srv/samvera_hls"
-     - "../bulk_ops:/srv/bulk_ops"
-     - "./config/database.yml:/srv/hycruz/config/database.yml"
-     - "./config/secrets.yml:/srv/hycruz/config/secrets.yml"
-     - "./config/fedora.yml:/srv/hycruz/config/fedora.yml"
-     - "./config/github.yml:/srv/hycruz/config/github.yml"
-     - "./example_media:/srv/hycruz/public/example_media"
-    environment: 
-      - IIIF_SERVER_URL=http://localhost:8182/iiif/2/
+     - "dams_derivatives:/dams_derivatives:Z"
     depends_on:
       - "db"
       - "repo"
@@ -52,20 +39,7 @@ services:
       dockerfile: worker-dockerfile
     container_name: worker
     volumes:
-     - "../dams_derivatives:/dams_derivatives:z"
-     - "../hyrax:/srv/hycruz:z"
-     - "gems2:/srv/bundle:Z"
-     - "../dams_ingest:/dams_ingest"
-     - "../scooby_snacks:/srv/scooby_snacks"
-     - "../samvera_hls:/srv/samvera_hls"
-     - "../bulk_ops:/srv/bulk_ops"
-     - "../fits:/srv/fits"
-     - "./config/database.yml:/srv/hycruz/config/database.yml"
-     - "./config/secrets.yml:/srv/hycruz/config/secrets.yml"
-     - "./config/fedora.yml:/srv/hycruz/config/fedora.yml"
-     - "./config/github.yml:/srv/hycruz/config/github.yml"
-     - "./example_media:/srv/hycruz/public/example_media"
-     - "./kakadu:/usr/share/kakadu"
+     - "dams_derivatives:/dams_derivatives:Z"
     env_file:
       - .env
       - .env.development
@@ -85,8 +59,6 @@ services:
       context: .
       dockerfile: repo-dockerfile
     container_name: fcrepo
-    volumes:
-      - "repository-data:/opt/fcrepo/data:Z"
     ports:
       - "8080:8080"
     networks:
@@ -96,6 +68,9 @@ services:
           - fedora
   db:
     image: mysql:5.7
+#    build:  
+#      context: .
+#      dockerfile: db-dockerfile
     container_name: mysql
     ports:
       - "3306:3306"
@@ -104,8 +79,6 @@ services:
       - .env
       - .env.development
     restart: always
-    volumes:
-      - "database-data:/var/lib/mysql:Z"
     networks:
       back-tier:
         aliases:
@@ -118,21 +91,19 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
       - '6379:6379'
-    volumes:
-      - redis-data:/bitnami/redis/data
     networks:
       back-tier:
         aliases:
           - queue
   index:
-    image: solr:7.7
+    image: registry.gitlab.com/notch8/ucsc-docker/index:latest
+    build: 
+      context: .
+      dockerfile: index-dockerfile
     container_name: solr
-    command: "bash -c 'precreate-core hycruz /opt/config && precreate-core hycruz-test /opt/config && solr-foreground'"
+    command: "bash -c 'solr-foreground'"
     ports: 
       - "8983:8983"
-    volumes:
-      - "./solr_conf:/opt/config:Z"
-      - "index-data:/opt/solr/server/solr:Z"
     environment:
       SOLR_HOME: /opt/solr/server/solr
     networks:
@@ -150,11 +121,6 @@ services:
     ports:
       - "8182:8182"
       - "8183:8183"
-    volumes:
-      - "../dams_derivatives:/dams_derivatives:z"
-      - "cantaloupe-log:/srv/cantaloupe-log:Z"
-      - "cantaloupe-cache:/srv/cantaloupe-cache:Z"
-      - "./kakadu:/usr/share/kakadu"
     networks:
       front-tier:
         aliases: 
@@ -167,14 +133,7 @@ services:
           - cantaloupe
           - hycruz-images
 volumes:
-  database-data:
-  gems:
-  gems2:
-  cantaloupe-log:
-  cantaloupe-cache:
-  index-data:
-  redis-data:
-  repository-data:
+  dams_derivatives:
 networks:
   front-tier:
   back-tier:
