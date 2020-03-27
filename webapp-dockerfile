@@ -1,3 +1,4 @@
+
 FROM ruby:2.4.1-stretch
 
 RUN apt-get -qq update \
@@ -15,28 +16,25 @@ RUN useradd -ms /bin/bash hycruz
 RUN chown -R hycruz:hycruz /srv
 USER hycruz
 
-RUN git clone https://github.com/UCSCLibrary/ScoobySnacks.git /srv/scooby_snacks
-RUN git clone https://github.com/UCSCLibrary/samvera_hls.git /srv/samvera_hls
-
+RUN git clone --branch docker-test https://github.com/UCSCLibrary/ucsc-library-digital-collections.git /srv/hycruz
+    
 #Set the locale to UTF-8 to prevent Bundler to fail when gemspecs contain non ASCII characters
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 
 ENV APP_DIR=/srv/hycruz 
 ENV TEMP=${APP_DIR}/tmp 
-#ENV BUNDLE_GEMFILE=$APP_DIR/Gemfile 
-#ENV BUNDLE_PATH=/srv/bundle
-
-ENV GEM_HOME="/srv/bundle"
-ENV PATH $GEM_HOME/bin:$GEM_HOME/gems/bin:$PATH
-RUN gem install bundler
 
 RUN mkdir -p ${APP_DIR}
+RUN mkdir /srv/dams_derivative
+RUN mkdir /srv/dams_ingest
 WORKDIR ${APP_DIR}
+
+RUN gem install bundler
+RUN bundle install
 
 EXPOSE 3000
 
 COPY hycruz-entrypoint.sh /srv/entrypoint.sh
-
 
 ENTRYPOINT ["/srv/entrypoint.sh"]
