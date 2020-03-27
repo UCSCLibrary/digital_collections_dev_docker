@@ -1,7 +1,5 @@
 #!/bin/bash
 set -e
-unset BUNDLE_PATH
-unset BUNDLE_BIN
 
 if [[ "$VERBOSE" = "yes" ]]; then
     set -x
@@ -16,32 +14,28 @@ if [ -f /srv/hycruz/tmp/pids/server.pid ]; then
   rm -rf /srv/hycruz/tmp/pids/server.pid
 fi
 
-# Uncomment this line to ssh into the container before loading the app
-#sleep infinity
+git pull
 
-#echo "Checking and Installing Ruby Gems"
-bundle check || bundle install
+gem install bundler
 
-echo "Running Database Migration"
-bundle exec rake db:migrate
+bundle install
+
+gem install bundler
 
 echo "Running Test Database Setup"
 bundle exec rails db:test:prepare
 
-#echo "Seeding Database"
-#bundle exec rake db:seed
-
-#echo "Load Workflows"
-#bundle exec rake hyrax:workflow:load
-
-#echo "Initialize Default Admin Set"
-#bundle exec rake hyrax:default_admin_set:create
-
-echo 'alias repl="cd /srv/hycruz; unset BUNDLE_PATH; unset BUNDLE_BIN; GEM_HOME=/srv/bundle; bundle exec rails c"' >> /home/hycruz/.bashrc
+echo 'alias repl="cd /srv/hycruz; bundle exec rails c"' >> /home/hycruz/.bashrc
 echo 'alias errors="tail -n 1000 /srv/hyrax/logs/development.log | grep FATAL -A 20 -B 20"' >> /home/hycruz/.bashrc
-echo 'unset BUNDLE_PATH' >> /home/hycruz/.bashrc
-echo 'unset BUNDLE_BIN' >> /home/hycruz/.bashrc
 
+# Uncomment this line to ssh into the container before loading the app
+sleep infinity
 
-echo "Starting the Rails Server"
-bundle exec rails s -b 0.0.0.0
+#echo "Starting the Rails Server"
+#bundle exec rails s -b 0.0.0.0
+
+#echo "Running local tests"
+#bundle exec rspec spec/local
+
+#echo "Running remote tests"
+#bundle exec rspec spec/remote
