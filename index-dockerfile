@@ -1,9 +1,16 @@
 FROM solr
 
 USER root
-RUN  mkdir /hycruz-solr-config
-COPY solr_conf /hycruz-solr-config
-RUN  chown -R solr:solr /hycruz-solr-config
+
+RUN mkdir /opt/config
+COPY solr_conf /opt/config
+RUN  chown -R solr:solr /opt/config
+
+RUN mkdir /opt/solr/server/solr/cores
+RUN chown solr:solr /opt/solr/server/solr/cores
 
 USER solr
+
+RUN /opt/docker-solr/scripts/precreate-core hycruz /opt/config; mv /var/solr/data/hycruz /opt/solr/server/solr/cores/
+RUN /opt/docker-solr/scripts/precreate-core hycruz-test /opt/config; mv /var/solr/data/hycruz-test /opt/solr/server/solr/cores/
 
