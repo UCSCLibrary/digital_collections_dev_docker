@@ -14,12 +14,12 @@ if [ -f /srv/hycruz/tmp/pids/server.pid ]; then
   rm -rf /srv/hycruz/tmp/pids/server.pid
 fi
 
+echo "Retrieving latest code"
 git pull
 
+echo "updating gemset"
 gem install bundler
-
 bundle install
-
 gem install bundler
 
 echo "Running Test Database Setup"
@@ -29,10 +29,10 @@ echo 'alias repl="cd /srv/hycruz; bundle exec rails c"' >> /home/hycruz/.bashrc
 echo 'alias errors="tail -n 1000 /srv/hyrax/logs/development.log | grep FATAL -A 20 -B 20"' >> /home/hycruz/.bashrc
 
 # Uncomment this line to ssh into the container before loading the app
-sleep infinity
+#sleep infinity
 
 #echo "Starting the Rails Server"
-#bundle exec rails s -b 0.0.0.0
+bundle exec rails s -b 0.0.0.0
 
 #echo "Running local tests"
 #bundle exec rspec spec/local
