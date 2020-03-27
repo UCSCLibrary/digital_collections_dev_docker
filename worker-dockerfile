@@ -19,22 +19,18 @@ RUN apt-get install -y --no-install-recommends -t stretch-backports \
     openjdk-8-jre-headless \
     ca-certificates-java
 
+# install fits
+RUN mkdir /srv/fits
+RUN wget https://github.com/harvard-lts/fits/releases/download/1.5.0/fits-1.5.0.zip
+RUN unzip fits-1.5.0.zip -d /srv/fits
+RUN chown -R hycruz:hycruz /srv/fits
+
 USER hycruz
 
-ENV LANG C.UTF-8
-ENV LC_ALL C.UTF-8
-
-ENV APP_DIR=/srv/hycruz 
-ENV TEMP=${APP_DIR}/tmp 
-
-ENV GEM_HOME="/srv/bundle"
+# install kakadu
+COPY kakadu /usr/share/kakadu
 ENV PATH $GEM_HOME/bin:$GEM_HOME/gems/bin:/usr/share/kakadu:$PATH
 ENV LD_LIBRARY_PATH /usr/share/kakadu:$LD_LIBRARY_PATH
 
-RUN mkdir -p ${APP_DIR}
-WORKDIR ${APP_DIR}
-
 COPY sidekiq-entrypoint.sh /srv/sidekiq-entrypoint.sh
-
 ENTRYPOINT ["/srv/sidekiq-entrypoint.sh"]
-
