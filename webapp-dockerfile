@@ -36,5 +36,6 @@ RUN bundle install
 EXPOSE 3000
 
 COPY hycruz-entrypoint.sh /srv/entrypoint.sh
+COPY wait-for-services.sh /srv/wait-for-services.sh
 
 ENTRYPOINT ["/srv/entrypoint.sh"]
