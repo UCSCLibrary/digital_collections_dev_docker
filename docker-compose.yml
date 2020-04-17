@@ -17,7 +17,6 @@ services:
       - "3000:3000"
     env_file:
       - .env
-      - .env.development
     networks:
       front-tier:
         aliases: 
@@ -52,7 +51,6 @@ services:
       - "33060:33060"
     env_file:
       - .env
-      - .env.development
     restart: always
     networks:
       back-tier:
