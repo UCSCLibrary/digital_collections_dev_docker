@@ -38,7 +38,7 @@ services:
       dockerfile: repo-dockerfile
     container_name: fcrepo
     ports:
-      - "8080:8080"
+      - "8082:8080"
     networks:
       back-tier:
         aliases:
@@ -74,6 +74,52 @@ services:
       back-tier:
         aliases:
           - solr
+#  worker:
+#    image: registry.gitlab.com/notch8/ucsc-docker/worker:latest
+#    build:  
+#      context: .
+#      dockerfile: worker-dockerfile
+#    container_name: worker
+#    volumes:
+#     - "dams_derivatives:/dams_derivatives:Z"
+#     - "./example_media:/srv/hycruz/public/example_media"
+#    env_file:
+#      - .env
+#      - .env.development
+#    depends_on:
+#      - "db"
+#      - "repo"
+#      - "index"
+#      - "redis"
+#    networks:
+#      back-tier:
+#        aliases:
+#          - sidekiq
+#          - worker_1
+#  images:
+#    image: registry.gitlab.com/notch8/ucsc-docker/images:latest
+#    build:  
+#      context: .
+#      dockerfile: cantaloupe-dockerfile
+#    container_name: cantaloupe
+#    depends_on:
+#      - "repo"
+#    ports:
+#      - "8182:8182"
+#      - "8183:8183"
+#    volumes:
+#      - "../dams_derivatives:/dams_derivatives:z"
+#    networks:
+#      front-tier:
+#        aliases: 
+#          - images
+#          - cantaloupe
+#          - hycruz-images
+#      back-tier:
+#        aliases:
+#          - images
+#          - cantaloupe
+#          - hycruz-images          
 volumes:
   dams_ingest:
   dams_derivatives:
