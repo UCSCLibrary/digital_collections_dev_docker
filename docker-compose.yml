@@ -9,6 +9,8 @@ services:
     container_name: hycruz
     volumes:
      - "dams_derivatives:/dams_derivatives:Z"
+     - "./wait-for-services.sh:/srv/hycruz/wait-for-services.sh"
+     - "./run-unit-tests-when-ready.sh:/srv/hycruz/run-unit-tests-when-ready.sh"
     depends_on:
       - "db"
       - "repo"
