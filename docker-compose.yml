@@ -6,6 +6,8 @@ services:
     build:  
       context: .
       dockerfile: webapp-dockerfile
+        args:
+          - BRANCH=${BRANCH}
     container_name: hycruz
     volumes:
      - "dams_derivatives:/dams_derivatives:Z"
@@ -17,6 +19,8 @@ services:
       - "3000:3000"
     env_file:
       - .env
+    environment:
+      - BRANCH
     networks:
       front-tier:
         aliases: 

@@ -1,6 +1,6 @@
 
 FROM ruby:2.4.1-stretch
-
+ARG BRANCH
 RUN apt-get -qq update \
     && apt-get install -y --no-install-recommends  \
                                               wget \
@@ -16,8 +16,7 @@ RUN useradd -ms /bin/bash hycruz
 RUN chown -R hycruz:hycruz /srv
 USER hycruz
 
-RUN echo "test"
-RUN git clone --branch ${GIT_BRANCH/origin\//} https://github.com/UCSCLibrary/ucsc-library-digital-collections.git /srv/hycruz
+RUN git clone --branch $GITHUB_BRANCH https://github.com/UCSCLibrary/ucsc-library-digital-collections.git /srv/hycruz
     
 #Set the locale to UTF-8 to prevent Bundler to fail when gemspecs contain non ASCII characters
 ENV LANG C.UTF-8
