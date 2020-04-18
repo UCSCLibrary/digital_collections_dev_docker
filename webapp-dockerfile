@@ -17,7 +17,7 @@ RUN chown -R hycruz:hycruz /srv
 USER hycruz
 
 RUN echo "test"
-RUN echo ${GIT_BRANCH/origin\//}
+RUN echo ${GIT_BRANCH/origin\\//}
 RUN git clone --branch ${GIT_BRANCH/origin\//} https://github.com/UCSCLibrary/ucsc-library-digital-collections.git /srv/hycruz
     
 #Set the locale to UTF-8 to prevent Bundler to fail when gemspecs contain non ASCII characters
