@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/notch8/ucsc-docker/webapp:latest
+        FROM registry.gitlab.com/notch8/ucsc-docker/webapp:latest
 
 USER root
 
@@ -30,6 +30,7 @@ ENV TEMP=${APP_DIR}/tmp
 ENV GEM_HOME="/srv/bundle"
 ENV PATH $GEM_HOME/bin:$GEM_HOME/gems/bin:/usr/share/kakadu:$PATH
 ENV LD_LIBRARY_PATH /usr/share/kakadu:$LD_LIBRARY_PATH
+RUN gem install bundler
 
 RUN mkdir -p ${APP_DIR}
 WORKDIR ${APP_DIR}
