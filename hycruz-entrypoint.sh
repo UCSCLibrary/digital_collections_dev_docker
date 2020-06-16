@@ -26,7 +26,7 @@ echo "Running Database Migration"
 bundle exec rake db:migrate
 
 echo "Running Test Database Setup"
-bundle exec rails db:test:prepare
+# bundle exec rails db:test:prepare
 
 #echo "Seeding Database"
 #bundle exec rake db:seed
