@@ -1,4 +1,4 @@
-FROM ruby:2.4.1-stretch
+FROM ruby:2.7.2
 
 RUN apt-get -qq update \
     && apt-get install -y --no-install-recommends  \
@@ -6,7 +6,7 @@ RUN apt-get -qq update \
                                               unzip \
                                               git \
                                               build-essential \
-                                              mysql-client \
+                                              libpq-dev \
                                               default-libmysqlclient-dev \
                                               nodejs 
 
@@ -36,6 +36,7 @@ WORKDIR ${APP_DIR}
 
 EXPOSE 3000
 
+COPY wait-for-services.sh /srv/wait-for-services.sh
 COPY hycruz-entrypoint.sh /srv/entrypoint.sh
 
 
