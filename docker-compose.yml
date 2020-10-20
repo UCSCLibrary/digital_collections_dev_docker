@@ -2,7 +2,7 @@ version: "3"
 
 services:
   web:
-    image: registry.gitlab.com/notch8/ucsc-docker/webapp:latest
+    image: registry.gitlab.com/notch8/ucsc-docker/webapp-test:latest
     build:  
       context: .
       dockerfile: webapp-dockerfile
