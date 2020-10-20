@@ -1,5 +1,5 @@
 
-FROM ruby:2.4.1-stretch
+FROM ruby:2.7.2
 ARG BRANCH
 RUN apt-get -qq update \
     && apt-get install -y --no-install-recommends  \
