@@ -62,66 +62,18 @@ services:
           - database
           - mysql
   index:
-    image: registry.gitlab.com/notch8/ucsc-docker/index:latest
-    build: 
-      context: .
-      dockerfile: index-dockerfile
+    image: solr:7.7
     container_name: solr
-    command: "bash -c 'solr-foreground'"
+    command: "bash -c 'precreate-core hycruz /opt/config && precreate-core hycruz-test /opt/config && solr-foreground'"
     ports: 
       - "8983:8983"
-    environment:
-      SOLR_HOME: /opt/solr/server/solr
+    volumes:
+      - "./solr_conf:/opt/config:Z"
+      - "index-data:/opt/solr/server/solr:Z"
     networks:
       back-tier:
         aliases:
           - solr
-#  worker:
-#    image: registry.gitlab.com/notch8/ucsc-docker/worker:latest
-#    build:  
-#      context: .
-#      dockerfile: worker-dockerfile
-#    container_name: worker
-#    volumes:
-#     - "dams_derivatives:/dams_derivatives:Z"
-#     - "./example_media:/srv/hycruz/public/example_media"
-#    env_file:
-#      - .env
-#      - .env.development
-#    depends_on:
-#      - "db"
-#      - "repo"
-#      - "index"
-#      - "redis"
-#    networks:
-#      back-tier:
-#        aliases:
-#          - sidekiq
-#          - worker_1
-#  images:
-#    image: registry.gitlab.com/notch8/ucsc-docker/images:latest
-#    build:  
-#      context: .
-#      dockerfile: cantaloupe-dockerfile
-#    container_name: cantaloupe
-#    depends_on:
-#      - "repo"
-#    ports:
-#      - "8182:8182"
-#      - "8183:8183"
-#    volumes:
-#      - "../dams_derivatives:/dams_derivatives:z"
-#    networks:
-#      front-tier:
-#        aliases: 
-#          - images
-#          - cantaloupe
-#          - hycruz-images
-#      back-tier:
-#        aliases:
-#          - images
-#          - cantaloupe
-#          - hycruz-images          
 volumes:
   dams_ingest:
   dams_derivatives:
