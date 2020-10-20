@@ -77,6 +77,7 @@ services:
 volumes:
   dams_ingest:
   dams_derivatives:
+  index-data:
 networks:
   front-tier:
   back-tier:
