@@ -1,20 +1,26 @@
 
 FROM ruby:2.7.2
 ARG BRANCH
+
 RUN apt-get -qq update \
     && apt-get install -y --no-install-recommends  \
                                               wget \
                                               unzip \
                                               git \
                                               build-essential \
-                                              mysql-client \
+                                              libpq-dev \
                                               default-libmysqlclient-dev \
                                               nodejs 
+
 
 #Switch to a non-root user
 RUN useradd -ms /bin/bash hycruz
 RUN chown -R hycruz:hycruz /srv
 USER hycruz
+
+
+RUN mkdir -p ~/.ssh
+RUN ssh-keyscan -t rsa github.com > ~/.ssh/known_hosts
 
 RUN git clone --branch $BRANCH https://github.com/UCSCLibrary/ucsc-library-digital-collections.git /srv/hycruz
     
@@ -40,3 +46,4 @@ COPY wait-for-services.sh /srv/wait-for-services.sh
 COPY run-unit-tests-when-ready.sh /srv/run-unit-tests-when-ready.sh
 
 ENTRYPOINT ["/srv/entrypoint.sh"]
+
