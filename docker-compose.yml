@@ -133,8 +133,6 @@ services:
     volumes:
       - "./solr_conf:/opt/config:Z"
       - "index-data:/opt/solr/server/solr:Z"
-    environment:
-      SOLR_HOME: /var/solr/data
     networks:
       back-tier:
         aliases:
