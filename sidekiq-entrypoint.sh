@@ -12,8 +12,6 @@ fi
 # do nothing, so we can ssh in and change things
 #sleep infinity
 
-# Wait for Redis
-
 echo "Checking and Installing Ruby Gems"
 bundle check || bundle install
 
@@ -27,6 +25,6 @@ echo "Stopping Existing sidekiq Tasks"
 ps aux |grep -i [s]idekiq | awk '{print $2}' | xargs kill -9 || true
 
 echo "Starting Sidekiq"
-exec bundle exec sidekiq -c 1 -L /srv/hycruz/log/sidekiq.log  >> /srv/hycruz/log/sidekiq.log 2>&1
+exec bundle exec sidekiq -c 1  >> /srv/hycruz/log/sidekiq.log 2>&1
 
 exec "$@"

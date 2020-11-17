@@ -112,7 +112,7 @@ services:
           - database
           - mysql
   redis:
-    image: 'bitnami/redis:latest'
+    image: 'docker.io/bitnami/redis:6.0-debian-10'
     container_name: redis
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
@@ -172,6 +172,7 @@ volumes:
   cantaloupe-cache:
   index-data:
   redis-data:
+    driver: local
   repository-data:
 networks:
   front-tier:

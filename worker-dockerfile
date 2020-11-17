@@ -1,8 +1,6 @@
-        FROM registry.gitlab.com/notch8/ucsc-docker/webapp:latest
+FROM registry.gitlab.com/notch8/ucsc-docker/webapp:latest
 
 USER root
-
-RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list
 
 RUN apt-get -qq update \
     && apt-get install -y --no-install-recommends  \
@@ -15,10 +13,6 @@ RUN apt-get -qq update \
       ffmpeg \
       libreoffice
                                                
-RUN apt-get install -y --no-install-recommends -t stretch-backports \
-    openjdk-8-jre-headless \
-    ca-certificates-java
-
 USER hycruz
 
 ENV LANG C.UTF-8
