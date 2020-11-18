@@ -15,6 +15,7 @@ if [ -f /srv/hycruz/tmp/pids/server.pid ]; then
 fi
 
 echo "Retrieving latest code"
+git checkout -- Gemfile.lock
 git pull
 
 echo "updating gemset"

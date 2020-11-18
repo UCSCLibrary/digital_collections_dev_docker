@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-echo "At least this script is running, amirite?"
 /srv/wait-for-services.sh localhost:3000 -t 600
 /srv/wait-for-services.sh db:3306 -t 180
 /srv/wait-for-services.sh repo:8080 -t 180
