@@ -24,6 +24,7 @@ USAGE
 
 wait_for()
 {
+    echo "Inside wait_for block"
     if [[ $WAITFORIT_TIMEOUT -gt 0 ]]; then
         echoerr "$WAITFORIT_cmdname: waiting $WAITFORIT_TIMEOUT seconds for $WAITFORIT_HOST:$WAITFORIT_PORT"
     else
@@ -66,6 +67,8 @@ wait_for_wrapper()
     fi
     return $WAITFORIT_RESULT
 }
+
+echo "processing arguments"
 
 # process arguments
 while [[ $# -gt 0 ]]
@@ -145,6 +148,8 @@ WAITFORIT_QUIET=${WAITFORIT_QUIET:-0}
 WAITFORIT_TIMEOUT_PATH=$(type -p timeout)
 WAITFORIT_TIMEOUT_PATH=$(realpath $WAITFORIT_TIMEOUT_PATH 2>/dev/null || readlink -f $WAITFORIT_TIMEOUT_PATH)
 
+echo "checking busybox bs"
+
 WAITFORIT_BUSYTIMEFLAG=""
 if [[ $WAITFORIT_TIMEOUT_PATH =~ "busybox" ]]; then
     WAITFORIT_ISBUSY=1
@@ -156,6 +161,8 @@ if [[ $WAITFORIT_TIMEOUT_PATH =~ "busybox" ]]; then
 else
     WAITFORIT_ISBUSY=0
 fi
+
+echo "about to do the thing"
 
 if [[ $WAITFORIT_CHILD -gt 0 ]]; then
     wait_for
