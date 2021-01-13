@@ -65,7 +65,7 @@ EXPOSE 3000
 
 COPY hycruz-entrypoint.sh /srv/entrypoint.sh
 COPY wait-for-services.sh /srv/wait-for-services.sh
-COPY run-unit-tests-when-ready.sh /srv/run-unit-tests-when-ready.sh
+COPY run-tests-when-ready.sh /srv/run-tests-when-ready.sh
 COPY run-smoke-tests-when-ready.sh /srv/run-smoke-tests-when-ready.sh
 
 ENTRYPOINT ["/srv/entrypoint.sh"]
