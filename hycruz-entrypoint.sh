@@ -23,6 +23,9 @@ gem install bundler
 bundle install
 gem install bundler
 
+echo "Running Database Migration"
+bundle exec rake db:migrate
+
 echo 'alias repl="cd /srv/hycruz; bundle exec rails c"' >> /home/hycruz/.bashrc
 echo 'alias errors="tail -n 1000 /srv/hyrax/logs/development.log | grep FATAL -A 20 -B 20"' >> /home/hycruz/.bashrc
 
